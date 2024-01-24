@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 def COLOR_MAP = [
     'FAILURE' : 'danger',
     'SUCCESS' : 'good'
@@ -54,3 +55,6 @@ pipeline{
            }
        }
 }
+=======
+
+>>>>>>> e6c1b5eaf1f54a1f0a9b23c77ffedc10392d3542
