@@ -1,26 +1,47 @@
-@Library('Jenkins_shared_library') _ 
 def COLOR_MAP = [
-    'SUCCESS': 'good',
-    'FAILURE': 'danger'
+    'FAILURE' : 'danger',
+    'SUCCESS' : 'good'
 ]
-
 pipeline{
     agent any
-    parameters {
-        choice(name: 'action', choices: 'create\ndelete', description: ' Select create or destroy.')
+    tools{
+        jdk 'jdk17'
+        nodejs 'node16'
     }
-    stages{
+    environment {
+        SCANNER_HOME=tool 'sonar-scanner'
+    }
+    stages {
         stage('clean workspace'){
             steps{
-                cleanWorkspace()
+                cleanWs()
             }
         }
-        stage('checkout from Git'){
+        stage('Checkout from Git'){
             steps{
-                checkoutGit('https://github.com/anujadx/Jenkins_shared_library.git', 'main')
+                git branch: 'main', url: 'https://github.com/anujadx/Youtube_Clone_App_K8s.git'
             }
         }
-    }
+        stage("Sonarqube Analysis "){
+            steps{
+                withSonarQubeEnv('sonar-server') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=youtube \
+                    -Dsonar.projectKey=youtube '''
+                }
+            }
+        }
+        stage("quality gate"){
+           steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
+                }
+            } 
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh "npm install"
+            }
+        }
 
     post {
          always {
