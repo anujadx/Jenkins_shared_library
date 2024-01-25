@@ -48,13 +48,13 @@ pipeline{
             }
         }
         
-        // stage('OWASP FS SCAN'){
-        //     when { expression { params.action == 'create'}}
-        //     steps {
-        //         dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'owasp-check'
-        //         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-        //     }
-        // }
+        stage('OWASP FS SCAN'){
+            when { expression { params.action == 'create'}}
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'owasp-check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
         stage('TRIVY FS SCAN') {
             steps {
                 sh "trivy fs . > trivyfs.txt"
@@ -71,11 +71,11 @@ pipeline{
                 }
             }
         }
-        // stage("TRIVY"){
-        //     steps{
-        //         sh "trivy image anuja1994/youtube:latest --scanners vuln > trivyimage.txt" 
-        //     }
-        // }
+        stage("TRIVY"){
+            steps{
+                sh "trivy image anuja1994/youtube:latest --scanners vuln > trivyimage.txt" 
+            }
+        }
         stage('Deploy to container'){
             steps{
                 sh 'docker run -d --name youtube -p 3000:3000 anuja1994/youtube:latest'
